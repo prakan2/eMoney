@@ -1,0 +1,30 @@
+node{
+    stage("git clone"  ){
+     git credentialsId: 'cd16a0a8-7b3e-4473-b5f1-f9124275ae76', url: 'http://veerababu@10.64.64.25:7990/scm/em/emoney2_repo.git',branch:'master'  
+    }
+    
+    stage("npm"){
+        sh "npm install"
+    }
+    stage("pm2"){
+        sh "pm2 start index.js"
+    }
+    stage ("Build Image") {
+      sh "docker build -t nodejs:${BUILD_NUMBER} ."  
+    }
+    stage ("Tagging the image") {
+     sh 'docker tag nodejs:${BUILD_NUMBER} vm1.anexinetdemo.com:80/feeds/nodejs:${BUILD_NUMBER}'
+            }
+	stage ("Push the  Image") {
+      sh 'docker push  vm1.anexinetdemo.com:80/feeds/nodejs:${BUILD_NUMBER}'
+    }
+	stage ("Octopus Build") {
+    script {
+        def checkoutVars = checkout([$class: 'GitSCM', userRemoteConfigs: [[url: 'http://veerababu@10.64.64.25:7990/scm/em/emoney2_repo.git']]])
+        env.GIT_URL = checkoutVars.'http://veerababu@10.64.64.25:7990/scm/em/emoney2_repo.git'
+        env.GIT_BRANCH = checkoutVars.master
+        env.GIT_COMMIT = checkoutVars.GIT_COMMIT
+    }
+    octopusPushBuildInformation commentParser: 'BitBucket', overwriteMode: 'FailIfExists', packageId: 'randomquotes', packageVersion: "1.0.${BUILD_NUMBER}", serverId: "octopus-server", spaceId: "Spaces-2", toolId: 'Default', gitUrl: "${GIT_URL}", gitBranch: "${GIT_BRANCH}", gitCommit: "${GIT_COMMIT}"
+}
+}

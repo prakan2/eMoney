@@ -1,0 +1,12 @@
+cicd:
+  kubectx: # Kubernetes Context name
+dev:
+  kubectx: # Kubernetes Context name
+  url: # Kubernetes Master API URL
+  namespace: default
+  proget:
+    username: # proget username
+    password: # proget password token
+  bitbucket:
+    username: # bitbucket username
+    password: # bitbucket password or authentication token

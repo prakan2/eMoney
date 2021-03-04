@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Application
+metadata:
+  namespace: OctopusDeploy
+  name: confirmation-service-ENVIRONMENT
+spec:
+  destination:
+    server: 'CLUSTER_URL'
+    namespace: WORKLOAD_NAMESPACE
+  source:
+    repoURL: 'https://bitbucket.com/emoney-gitops'
+    targetRevision: master
+    path: 'ENVIRONMENT/confirmation-service'
+  project: ENVIRONMENT
+  syncPolicy:
+    automated:
+      automated:
+        prune: false
+        selfHeal: false
+      prune: true
+      selfHeal: true
