@@ -1,0 +1,14 @@
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+ annotations:
+ name: nodeapi
+ namespace: default
+spec:
+ maxReplicas: 5
+ minReplicas: 1
+ scaleTargetRef:
+  apiVersion: apps/v1
+  kind: Deployment
+  name: nodeapi
+ targetCPUUtilizationPercentage: 1

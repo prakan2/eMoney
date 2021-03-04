@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nodeapi
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: nodeapi
+  template:
+    metadata:
+      labels:
+        app: nodeapi
+        
+    spec:
+      containers:
+        - name: nodejs-service
+          image: nodejs-image // from proget
+          imagePullPolicy: Always
+          env:
+            - name: SERVER_PORT
+              value: "8080"
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            livenessProbe:
+            initialDelaySeconds: 30
+            periodSeconds: 3
+            httpGet:
+              path: /actuator/health/liveness
+              port: 3000
+          readinessProbe:
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            httpGet:
+              path: /actuator/health/readiness
+              port: 3000
+          resources:
+            requests:
+              memory: 768Mi
+              cpu: 500m
+            limits:
+              memory: 768Mi
+          ports:
+            - containerPort: 3000
